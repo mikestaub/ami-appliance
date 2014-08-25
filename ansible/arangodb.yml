@@ -15,9 +15,17 @@
                 section=dispatcher
                 option=disable-dispatcher-kickstarter
                 value=no
+      notify:
+      - restart arangodb
     - name: enable dispatcher frontend
       ini_file: dest=/etc/anotherconf
                 section=dispatcher
                 option=disable-dispatcher-frontend
                 value=no
-            
+      notify:
+      - restart arangodb
+    - name: ensure arangodb is running
+      service: name=arangodb state=started
+  handlers:
+    - name: restart arangodb
+      service: name=arangodb state=restarted
