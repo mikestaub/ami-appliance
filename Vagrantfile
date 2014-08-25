@@ -4,10 +4,15 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "hashicorp/precise64"
+  config.vm.box = "precise64-arangodb"
+  config.vm.box_url = "https://www.arangodb.org/documents/precise64-arangodb.box"
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "ansible/arangodb.yml"
+    ansible.extra_vars = {
+      disable_dispatcher_kickstarter: "no",
+      disable_dispatcher_frontend: "no"
+    }
   end
 
   config.vm.provider "virtualbox" do |v|
@@ -16,7 +21,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   4.times do |t|
-    config.vm.define "arangodb-node-#{t}" do |node|
+    name = "arangodb-node-#{t}"
+    config.vm.define name do |node|
+      node.vm.hostname = name
       node.vm.network "private_network", ip: "192.168.77.#{10 + t}"
     end
   end
