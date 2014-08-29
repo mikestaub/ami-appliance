@@ -35,14 +35,14 @@ endpoint = tcp://0.0.0.0:8529
 disable-authentication = yes
 
 # number of worker threads for V8
-threads = {{ ansible_processor_threads_per_core * 3 | round }}
+threads = {{ ansible_processor_threads_per_core * 3 | round | int }}
 
 # the user and group are normally set in the start script
 # uid = arangodb
 # gid = arangodb
 
 [scheduler]
-threads = {{ ((ansible_memtotal_mb / 1024) * 8) | round }}
+threads = {{ ((ansible_memtotal_mb / 1024) * 8) | round | int }}
 
 [javascript]
 startup-directory = /usr/share/arangodb/js
