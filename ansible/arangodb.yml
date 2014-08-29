@@ -10,8 +10,10 @@
       apt_repository: repo='deb https://www.arangodb.org/repositories/arangodb2/xUbuntu_12.04 /' state=present
     - name: Install arangodb
       apt: name=arangodb=2.2.2 update_cache=yes
-    - name: Start up arangodb
+    - name: Stop up arangodb
       service: name=arangodb state=stopped
+    - name: Wait until ArangoDB is shut down
+      wait_for: path=/var/lib/arangodb/LOCK state=absent delay=2
     - name: Create dispatcher config
       template: src=templates/arangod.dispatcher.conf.j2 dest=/etc/arangodb/arangod.conf
       notify: restart arangodb
