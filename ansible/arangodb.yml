@@ -2,6 +2,8 @@
 - hosts: all
   sudo: yes
   tasks:
+    - name: install python-pycurl
+      apt: name=python-pycurl
     - name: add arangodb key
       apt_key: url=https://www.arangodb.org/repositories/arangodb2/xUbuntu_12.04/Release.key state=present
     - name: add arangodb repo
