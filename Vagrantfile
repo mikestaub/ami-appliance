@@ -9,10 +9,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "ansible/arangodb.yml"
-    ansible.extra_vars = {
-      disable_dispatcher_kickstarter: "no",
-      disable_dispatcher_frontend: "no"
-    }
   end
 
   config.vm.provider "virtualbox" do |v|

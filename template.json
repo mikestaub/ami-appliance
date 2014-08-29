@@ -5,7 +5,10 @@
     "provisioners": [
         {
             "type": "shell",
-            "inline": ["sudo aptitude install -y ansible"]
+            "inline": [
+                "sudo aptitude update",
+                "sudo aptitude install -y ansible python-pycurl"
+            ]
         },
         {
             "type": "ansible-local",

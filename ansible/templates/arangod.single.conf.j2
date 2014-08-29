@@ -26,7 +26,7 @@ directory = /var/lib/arangodb
 #   endpoint = tcp://[::]:8529
 #   endpoint = tcp://[fe80::21a:5df1:aede:98cf]:8529
 #
-endpoint = tcp://0.0.0.0:8429
+endpoint = tcp://0.0.0.0:8529
 
 # resuse a port on restart or wait until it is freed by the operating system
 # reuse-address = false
@@ -35,14 +35,14 @@ endpoint = tcp://0.0.0.0:8429
 disable-authentication = yes
 
 # number of worker threads for V8
-threads = 2
+threads = {{ ansible_processor_threads_per_core * 3 | round }}
 
 # the user and group are normally set in the start script
 # uid = arangodb
 # gid = arangodb
 
 [scheduler]
-threads = 2
+threads = {{ ((ansible_memtotal_mb / 1024) * 8) | round }}
 
 [javascript]
 startup-directory = /usr/share/arangodb/js
@@ -55,8 +55,8 @@ severity = human
 file = /var/log/arangodb/arangod.log
 
 [cluster]
-disable-dispatcher-kickstarter = no
-disable-dispatcher-frontend = no
+disable-dispatcher-kickstarter = {{ disable_dispatcher_kickstarter | default("yes") }}
+disable-dispatcher-frontend = {{ disable_dispatcher_frontend | default("yes") }}
 data-path = /var/lib/arangodb/cluster
 log-path = /var/log/arangodb/cluster
 agent-path = /usr/lib/arangodb/etcd-arango
