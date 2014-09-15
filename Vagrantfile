@@ -4,8 +4,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "precise64-arangodb"
-  config.vm.box_url = "https://www.arangodb.org/documents/precise64-arangodb.box"
+  config.vm.box = "ubuntu/trusty64"
+  #config.vm.box_url = "https://www.arangodb.org/documents/precise64-arangodb.box"
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "ansible/arangodb.yml"

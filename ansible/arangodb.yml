@@ -4,16 +4,14 @@
   tasks:
     - name: Install python-pycurl
       apt: name=python-pycurl
-    - name: Add arangodb key
-      apt_key: url=https://www.arangodb.org/repositories/arangodb2/xUbuntu_12.04/Release.key state=present
-    - name: Add arangodb repo
-      apt_repository: repo='deb https://www.arangodb.org/repositories/arangodb2/xUbuntu_12.04 /' state=present
-    - name: Install arangodb
-      apt: name=arangodb=2.2.2 update_cache=yes
-    - name: Stop up arangodb
+    - name: Download ArangoDB pregel build
+      get_url: url=http://test.arangodb.org/sinnlos/arangodb_2.4d_amd64.deb dest=/var/cache/apt/arangodb_2.4d_amd64.deb sha256sum=9ad434bb359d053211de1573fb012bbeb95b3cfbe07ff8de853f63c7e5a52764
+    - name: Install ArangoDB from file
+      shell: dpkg -i arangodb_2.4d_amd64.deb chdir=/var/cache/apt/
+    - pause: seconds=5
+    - name: Stop arangodb
       service: name=arangodb state=stopped
-    - name: Wait until ArangoDB is shut down
-      wait_for: path=/var/lib/arangodb/LOCK state=absent delay=2
+    - pause: seconds=5
     - name: Create dispatcher config
       template: src=templates/arangod.dispatcher.conf.j2 dest=/etc/arangodb/arangod.conf
       notify: restart arangodb
