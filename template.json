@@ -6,8 +6,15 @@
         {
             "type": "shell",
             "inline": [
+                "sleep 30",
                 "sudo aptitude update",
                 "sudo aptitude install -y ansible python-pycurl"
+            ]
+        },
+        {
+            "type": "shell",
+            "inline": [
+                "sleep 30"
             ]
         },
         {
