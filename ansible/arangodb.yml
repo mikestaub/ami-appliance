@@ -2,14 +2,16 @@
 - hosts: all
   sudo: yes
   tasks:
+    - name: install libgmp10
+      apt: name=libgmp10
     - name: install python-pycurl
       apt: name=python-pycurl
     - name: add arangodb key
-      apt_key: url=https://www.arangodb.org/repositories/arangodb2/xUbuntu_12.04/Release.key state=present
+      apt_key: url=https://www.arangodb.com/repositories/arangodb2/xUbuntu_12.04/Release.key state=present
     - name: add arangodb repo
-      apt_repository: repo='deb https://www.arangodb.org/repositories/arangodb2/xUbuntu_12.04 /' state=present
+      apt_repository: repo='deb https://www.arangodb.com/repositories/arangodb2/xUbuntu_12.04 /' state=present
     - name: install arangodb
-      apt: name=arangodb=2.2.2 update_cache=yes
+      apt: name=arangodb=2.2.6 update_cache=yes
     - name: Create a cluster Config file
       template: src=templates/arangod.dispatcher.conf.j2 dest=/etc/arangodb/arangod.conf
     - name: enable dispatcher kickstarter

@@ -5,21 +5,27 @@
     "provisioners": [
         {
             "type": "shell",
+            "inline": ["sudo aptitude update"]
+        },
+        {
+            "type": "shell",
             "inline": ["sudo aptitude install -y ansible"]
         },
         {
             "type": "ansible-local",
-            "playbook_file": "ansible/arangodb.yml"
+            "playbook_file": "ansible/arangodb.yml",
+            "playbook_dir": "ansible"
         }
     ],
     "builders": [
         {
             "type": "amazon-ebs",
             "region": "eu-west-1",
-            "source_ami": "ami-3907d64e",
-            "instance_type": "t1.micro",
+            "source_ami": "ami-35865242",
+            "instance_type": "m3.medium",
+            "ami_virtualization_type": "hvm",
             "ssh_username": "ubuntu",
-            "ami_name": "arangodb-2.2.2-{{timestamp}}"
+            "ami_name": "arangodb-2.2.6-{{timestamp}}"
         }
     ]
 }
