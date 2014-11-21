@@ -2,6 +2,8 @@
 - hosts: all
   sudo: yes
   tasks:
+    - name: install libgmp10
+      apt: name=libgmp10
     - name: Install python-pycurl
       apt: name=python-pycurl
     - name: Download ArangoDB pregel build

@@ -6,13 +6,6 @@
     {
       "type": "shell",
       "inline": [
-        "mkdir -p  /tmp/packer-provisioner-ansible-local"
-        ],
-      "pause_before": "30s"
-    },
-    {
-      "type": "shell",
-      "inline": [
         "sudo aptitude update",
         "sudo aptitude install -y ansible python-pycurl"
         ]
@@ -20,18 +13,18 @@
     {
       "type": "ansible-local",
       "playbook_file": "ansible/arangodb.yml",
-      "playbook_dir": "ansible/"
+      "playbook_dir": "ansible"
     }
   ],
     "builders": [
     {
       "type": "amazon-ebs",
-      "region": "eu-west-1",
-      "source_ami": "ami-35865242",
+      "region": "us-east-1",
+      "source_ami": "ami-ce5be9a6",
       "instance_type": "m3.medium",
       "ami_virtualization_type": "hvm",
       "ssh_username": "ubuntu",
-      "ami_name": "arangodb-2.2.2-{{timestamp}}",
+      "ami_name": "arangodb-pregel-{{timestamp}}",
       "vpc_id": ""
     }
   ]
