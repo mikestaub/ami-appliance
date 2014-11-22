@@ -1,31 +1,47 @@
 {
-    "variables": {
-    },
+  "variables": {
+  },
 
     "provisioners": [
-        {
-            "type": "shell",
-            "inline": ["sudo aptitude update"]
-        },
-        {
-            "type": "shell",
-            "inline": ["sudo aptitude install -y ansible"]
-        },
-        {
-            "type": "ansible-local",
-            "playbook_file": "ansible/arangodb.yml",
-            "playbook_dir": "ansible"
-        }
-    ],
+    {
+      "type": "shell",
+      "inline": ["sudo aptitude update"]
+    },
+    {
+      "type": "shell",
+      "inline": ["sudo aptitude install -y ansible"]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/arangodb.yml",
+      "playbook_dir": "ansible"
+    }
+  ],
     "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "us-east-1",
+      "source_ami": "ami-ce5be9a6",
+      "instance_type": "m3.medium",
+      "ami_virtualization_type": "hvm",
+      "ssh_username": "ubuntu",
+      "ami_name": "arangodb-2.2.6-{{timestamp}}",
+      "ami_block_device_mappings": [
         {
-            "type": "amazon-ebs",
-            "region": "us-east-1",
-            "source_ami": "ami-ce5be9a6",
-            "instance_type": "m3.medium",
-            "ami_virtualization_type": "hvm",
-            "ssh_username": "ubuntu",
-            "ami_name": "arangodb-2.2.6-{{timestamp}}"
+          "device_name": "/dev/sde",
+          "volume_size": 80,
+          "volume_type": "gp2",
+          "delete_on_termination": true
         }
-    ]
+      ],
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sde",
+          "volume_size": 80,
+          "volume_type": "gp2",
+          "delete_on_termination": true
+        }
+      ]
+    }
+  ]
 }
