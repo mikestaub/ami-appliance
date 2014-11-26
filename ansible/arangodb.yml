@@ -18,7 +18,7 @@
     - name: add arangodb repo
       apt_repository: repo='deb https://www.arangodb.com/repositories/arangodb2/xUbuntu_12.04 /' state=present
     - name: install arangodb
-      apt: name=arangodb=2.2.6 update_cache=yes
+      apt: name=arangodb=2.3.0 update_cache=yes
     - name: create arangodb standalone folder
       file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
     - name: create arangodb cluster folder
