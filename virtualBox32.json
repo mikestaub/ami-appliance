@@ -1,0 +1,61 @@
+{
+  "variables": {
+    "ssh_name": "ubuntu",
+    "ssh_pass": "ubuntu",
+    "hostname": "ubuntu",
+    "imagefolder": "{{env `UBUNTU_IMAGES`}}",
+    "preseedhost": "{{env `PRESEED_HOST`}}"
+  },
+
+    "provisioners": [
+    {
+      "type": "shell",
+      "inline": ["echo {{user `ssh_pass`}} | sudo -S sh -c 'echo \"%sudo ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers'"]
+    },
+    {
+      "type": "shell",
+      "inline": ["sudo aptitude update"]
+    },
+    {
+      "type": "shell",
+      "inline": ["sudo aptitude install -y ansible"]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/arangodb.yml",
+      "playbook_dir": "ansible"
+    }
+  ],
+    "builders": [
+    {
+      "vm_name": "ArangoDB32",
+      "type": "virtualbox-iso",
+      "guest_os_type": "Ubuntu",
+      "iso_url": "{{user `imagefolder`}}/ubuntu-14.04.1-server-i386.iso",
+      "iso_checksum": "3aa14ca13d52df070870d39306f4a4eb",
+      "iso_checksum_type": "md5",
+      "ssh_username": "{{user `ssh_name`}}",
+      "ssh_password": "{{user `ssh_pass`}}",
+      "ssh_wait_timeout": "30m",
+      "output_directory": "VirtualBox",
+      "shutdown_command": "echo {{user `ssh_pass`}} | sudo -S shutdown -P now",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "512"],
+        ["modifyvm", "{{.Name}}", "--cpus", "1"],
+        ["modifyvm", "{{.Name}}", "--hwvirtex", "off"],
+        ["modifyvm", "{{.Name}}", "--natpf1", "ArangoDB,tcp,,8529,,8529"]
+      ],
+      "boot_command" : [
+        "<esc><esc><enter><wait>",
+        "/install/vmlinuz noapic ",
+        "preseed/url={{user `preseedhost`}}/preseed.cfg ",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        "hostname={{user `hostname`}} ",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+        "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+        "initrd=/install/initrd.gz -- <enter>"
+      ]
+    }
+  ]
+}

@@ -39,6 +39,10 @@
                 value=no
       notify:
       - restart arangodb
+    - name: make sure arangodb uses upgraded db folder
+      command: service arangodb upgrade
+      notify:
+      - restart arangodb
     - name: ensure arangodb is running
       service: name=arangodb state=started
   handlers:
