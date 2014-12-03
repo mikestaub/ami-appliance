@@ -37,7 +37,7 @@
       "iso_checksum_type": "md5",
       "ssh_username": "{{user `ssh_name`}}",
       "ssh_password": "{{user `ssh_pass`}}",
-      "ssh_wait_timeout": "300m",
+      "ssh_wait_timeout": "30m",
       "output_directory": "VirtualBox",
       "shutdown_command": "echo {{user `ssh_pass`}} | sudo -S shutdown -P now",
       "vboxmanage": [
