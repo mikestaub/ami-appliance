@@ -45,6 +45,10 @@
       - restart arangodb
     - name: ensure arangodb is running
       service: name=arangodb state=started
+    - name: Remove authorized keys from user ubuntu
+      action: rm /home/ubuntu/.ssh/authorized_keys
+    - name: Remove authorized keys from user root
+      action: rm /root/.ssh/authorized_keys
   handlers:
     - name: restart arangodb
       service: name=arangodb state=restarted
