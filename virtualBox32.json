@@ -4,7 +4,8 @@
     "ssh_pass": "arangodb",
     "hostname": "arangodb",
     "imagefolder": "{{env `UBUNTU_IMAGES`}}",
-    "preseedhost": "{{env `PRESEED_HOST`}}"
+    "preseedhost": "{{env `PRESEED_HOST`}}",
+    "version": "{{env `ARANGODB_VERSION`}}"
   },
 
     "provisioners": [
@@ -28,7 +29,7 @@
   ],
     "builders": [
     {
-      "vm_name": "ArangoDB-{{env `ARANGODB_VERSION`}}-32bit",
+      "vm_name": "ArangoDB-{{user `version`}}-32bit",
       "type": "virtualbox-iso",
       "guest_os_type": "Ubuntu",
       "headless": true,
