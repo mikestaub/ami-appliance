@@ -8,6 +8,8 @@
       apt: name=libgmp10
     - name: install python-pycurl
       apt: name=python-pycurl
+    - name: create issue file so that people know what to do
+      template: src=templates/greetings.txt dest=/etc/issue
     - name: add arangodb key
       apt_key: url=https://www.arangodb.com/repositories/arangodb2/xUbuntu_12.04/Release.key state=present validate_certs=no
     - name: add arangodb repo
@@ -18,7 +20,7 @@
       file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
     - name: create arangodb cluster folder
       file: path={{mount_dir}}/cluster state=directory owner=arangodb group=arangodb
-    - name: Create a cluster Config file
+    - name: create a cluster Config file
       template: src=templates/arangod.dispatcher.conf.j2 dest=/etc/arangodb/arangod.conf
     - name: enable dispatcher kickstarter
       ini_file: dest=/etc/anotherconf

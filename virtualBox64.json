@@ -1,8 +1,8 @@
 {
   "variables": {
-    "ssh_name": "ubuntu",
-    "ssh_pass": "ubuntu",
-    "hostname": "ubuntu",
+    "ssh_name": "arangodb",
+    "ssh_pass": "arangodb",
+    "hostname": "arangodb",
     "imagefolder": "{{env `UBUNTU_IMAGES`}}",
     "preseedhost": "{{env `PRESEED_HOST`}}"
   },
@@ -28,7 +28,7 @@
   ],
     "builders": [
     {
-      "vm_name": "ArangoDB64",
+      "vm_name": "ArangoDB-{{env `ARANGODB_VERSION`}}-64bit",
       "type": "virtualbox-iso",
       "guest_os_type": "Ubuntu_64",
       "headless": true,
@@ -42,7 +42,7 @@
       "output_directory": "VirtualBox",
       "shutdown_command": "echo {{user `ssh_pass`}} | sudo -S shutdown -P now",
       "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--memory", "512"],
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
         ["modifyvm", "{{.Name}}", "--cpus", "2"],
         ["modifyvm", "{{.Name}}", "--hwvirtex", "on"],
         ["modifyvm", "{{.Name}}", "--natpf1", "ArangoDB,tcp,,8529,,8529"]

@@ -1,8 +1,8 @@
 {
   "variables": {
-    "ssh_name": "ubuntu",
-    "ssh_pass": "ubuntu",
-    "hostname": "ubuntu",
+    "ssh_name": "arangodb",
+    "ssh_pass": "arangodb",
+    "hostname": "arangodb",
     "imagefolder": "{{env `UBUNTU_IMAGES`}}",
     "preseedhost": "{{env `PRESEED_HOST`}}"
   },
@@ -28,7 +28,7 @@
   ],
     "builders": [
     {
-      "vm_name": "ArangoDB32",
+      "vm_name": "ArangoDB-{{env `ARANGODB_VERSION`}}-32bit",
       "type": "virtualbox-iso",
       "guest_os_type": "Ubuntu",
       "headless": true,
