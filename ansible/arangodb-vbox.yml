@@ -1,0 +1,51 @@
+---
+- hosts: all
+  sudo: yes
+
+  vars:
+    mount_dir: /vol/data
+
+  tasks:
+
+    # install system packages
+    - name: install libgmp10
+      apt: name=libgmp10
+
+    - name: install python-pycurl
+      apt: name=python-pycurl
+
+    # tweak system
+    - name: create issue file so that people know what to do
+      copy: src=templates/greetings.txt dest=/etc/issue
+
+    # copy arangodb package
+    - name: copy arangodb debian package
+      copy: src=arangodb.deb dest=/tmp/arangodb.deb
+
+    # install and setup arangodb package
+    - name: install arangodb
+      command: dpkg --install /tmp/arangodb.deb
+
+    - name: stop the service
+      command: service arangodb stop
+
+    - name: cleanup old package
+      command: rm /tmp/arangodb.deb
+
+    - name: create arangodb standalone folder
+      file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
+
+    - name: create arangodb cluster folder
+      file: path={{mount_dir}}/cluster state=directory owner=arangodb group=arangodb
+
+    - name: make sure arangodb uses upgraded db folder
+      command: service arangodb upgrade
+      notify:
+      - restart arangodb
+
+    - name: ensure arangodb is running
+      service: name=arangodb state=started
+
+  handlers:
+    - name: restart arangodb
+      service: name=arangodb state=restarted
