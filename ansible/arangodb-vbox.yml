@@ -30,7 +30,7 @@
       command: service arangodb stop
 
     - name: wait for service to shutdown
-      pause: minutes=1
+      pause: minutes=3
 
     - name: cleanup old package
       command: rm /tmp/arangodb.deb
