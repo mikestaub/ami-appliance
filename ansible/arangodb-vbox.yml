@@ -41,6 +41,12 @@
     - name: create arangodb cluster folder
       file: path={{mount_dir}}/cluster state=directory owner=arangodb group=arangodb
 
+    - name: bind arango to 0.0.0.0 interface.
+      command: sed 's/^\s*endpoint\s*=\s*tcp:\/\/127\.0\.0\.1/endpoint = tcp\/\/0.0.0.0/g' /etc/arangodb/arangod.conf > /tmp/arangod.conf.tmp
+
+    - name: copy modified configuration file.
+      command: cp /tmp/arangod.conf.tmp /etc/arangodb/arangod.conf
+
     - name: make sure arangodb uses upgraded db folder
       command: service arangodb upgrade
       notify:
