@@ -11,6 +11,9 @@
     - name: install libgmp10
       apt: name=libgmp10
 
+    - name: install libgoogle-perftools4
+      apt: name=libgoogle-perftools4
+
     - name: install python-pycurl
       apt: name=python-pycurl
 
