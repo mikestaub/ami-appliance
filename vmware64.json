@@ -29,24 +29,19 @@
   ],
     "builders": [
     {
-      "vm_name": "ArangoDB-{{user `version`}}-32bit",
-      "type": "virtualbox-iso",
-      "guest_os_type": "Ubuntu",
+      "vm_name": "ArangoDB-{{user `version`}}-64bit",
+      "type": "vmware-iso",
+      "guest_os_type": "Ubuntu_64",
       "headless": true,
-      "format": "ova",
-      "iso_url": "{{user `imagefolder`}}/ubuntu-14.04.1-server-i386.iso",
-      "iso_checksum": "3aa14ca13d52df070870d39306f4a4eb",
+      "iso_url": "{{user `imagefolder`}}/ubuntu-14.04.1-server-amd64.iso",
+      "iso_checksum": "ca2531b8cd79ea5b778ede3a524779b9",
       "iso_checksum_type": "md5",
       "ssh_username": "{{user `ssh_name`}}",
-      "ssh_password": "{{user `ssh_pass`}}",
-      "ssh_wait_timeout": "30m",
-      "output_directory": "VirtualBox",
+      "output_directory": "VMware",
       "shutdown_command": "echo {{user `ssh_pass`}} | sudo -S shutdown -P now",
-      "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--memory", "512"],
-        ["modifyvm", "{{.Name}}", "--cpus", "1"],
-        ["modifyvm", "{{.Name}}", "--hwvirtex", "off"],
-        ["modifyvm", "{{.Name}}", "--natpf1", "ArangoDB,tcp,,8529,,8529"]
+      "vmx_data": {
+        "memsize": "2048",
+        "numvcpus", "2"]
       ],
       "boot_command" : [
         "<esc><esc><enter><wait>",
