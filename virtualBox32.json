@@ -34,6 +34,7 @@
       "guest_os_type": "Ubuntu",
       "headless": true,
       "format": "ova",
+      "version": "9",
       "iso_url": "{{user `imagefolder`}}/ubuntu-14.04.1-server-i386.iso",
       "iso_checksum": "3aa14ca13d52df070870d39306f4a4eb",
       "iso_checksum_type": "md5",
