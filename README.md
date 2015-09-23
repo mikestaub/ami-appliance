@@ -29,10 +29,10 @@ $ export AWS_SECRET_ACCESS_KEY=likewise
 $ packer build template.json
 ```
 
-## Virtual Box
+## General
 
 Download packer as described above.
-To build the VirtualBox images you need to export two variables:
+To build images you need to export two variables:
 
 ```
 export UBUNTU_IMAGES="http://releases.ubuntu.com/14.04/"
@@ -44,6 +44,8 @@ Alternatively you can download the images and export the folder containing them 
 Replace the exports above accordingly.
 Afterwards you can execute packer.
 
+## Virtual Box
+
 32bit version:
 ```
 $ packer build virtualBox32.json
@@ -53,3 +55,12 @@ $ packer build virtualBox32.json
 ```
 $ packer build virtualBox64.json
 ```
+
+## VMWare
+To build the vmware image, download and install [the vagrant-vmware-ovf plugin](https://github.com/frapposelli/packer-post-processor-vagrant-vmware-ovf).
+
+64bit version:
+```
+$ packer build vmware64.json
+```
+
