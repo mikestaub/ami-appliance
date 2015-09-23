@@ -57,8 +57,10 @@ $ packer build virtualBox64.json
 ```
 
 ## VMWare
+First install [vmware workstation like explained here](http://tutorialforlinux.com/2013/09/17/linux-debian-vmware-workstation-10-how-to-install-and-getting-started/).
 To build the vmware image, download and install [the vagrant-vmware-ovf plugin](https://github.com/frapposelli/packer-post-processor-vagrant-vmware-ovf).
 
+**Note that the vmware demo versions don't support multi CPU setups**
 64bit version:
 ```
 $ packer build vmware64.json
