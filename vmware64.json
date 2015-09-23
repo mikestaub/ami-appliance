@@ -8,7 +8,7 @@
     "version": "{{env `ARANGODB_VERSION`}}"
   },
 
-    "provisioners": [
+  "provisioners": [
     {
       "type": "shell",
       "inline": ["echo {{user `ssh_pass`}} | sudo -S sh -c 'echo \"%sudo ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers'"]
@@ -27,7 +27,7 @@
       "playbook_dir": "ansible"
     }
   ],
-    "builders": [
+  "builders": [
     {
       "vm_name": "ArangoDB-{{user `version`}}-64bit",
       "type": "vmware-iso",
@@ -61,5 +61,11 @@
         "initrd=/install/initrd.gz -- <enter>"
       ]
     }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant-vmware-ovf",
+      "compression_level": 9,
+      "output": "ArangoDB-{{user `version`}}.box"}
   ]
 }
