@@ -1,2 +1,4 @@
 .vagrant/
 packer_cache/
+AMAZON/ansible/arangodb.yml
+AMAZON/template.json

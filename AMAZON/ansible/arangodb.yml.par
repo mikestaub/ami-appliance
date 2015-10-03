@@ -1,0 +1,71 @@
+---
+- hosts: all
+  sudo: yes
+
+  vars:
+    mount_dir: /vol/data
+
+  tasks:
+    - name: install libgmp10
+      apt: name=libgmp10
+
+    - name: install python-pycurl
+      apt: name=python-pycurl
+
+    - name: install cloud-utils
+      apt: name=cloud-utils
+
+    - name: format new volume
+      filesystem: fstype=ext4 dev=/dev/xvde
+
+    - name: edit fstab and mount the vol
+      action: mount name={{mount_dir}} src=/dev/xvde opts=noatime fstype=ext4 state=mounted
+
+    - name: add arangodb key
+      apt_key:
+        url=https://www.arangodb.com/repositories/arangodb2/xUbuntu_14.04/Release.key
+        state=present
+        validate_certs=no
+
+    - name: Create a cluster Config file
+      template: src=templates/arangod.conf.local.j2 dest=/etc/arangodb/arangod.conf.local
+
+    - name: create arangodb temporary standalone folder
+      file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
+
+    - name: add arangodb repo
+      apt_repository:
+        repo='deb https://www.arangodb.com/repositories/arangodb2/xUbuntu_14.04 /'
+        state=present
+
+    - name: install arangodb
+      apt: name=arangodb=$VERSION update_cache=yes
+
+    - name: ensure arangodb is running
+      service: name=arangodb state=stopped
+
+    - name: delete arangodb temporay standalone folder
+      file: path={{mount_dir}}/standalone state=absent
+
+    - name: patch startup script to use default password
+      infile:
+        dest=/etc/init.d/arangodb
+        insertafter="^CONF="
+        regexp="^ARANGODB_DEFAULT_ROOT_PASSWORD="
+        line="$(ec2metadata --instance-id)"
+        state=present
+
+    - name: create arangodb finally standalone folder
+      file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
+
+    - name: ensure arangodb is running
+      service: name=arangodb state=started
+
+    - name: ensure arangodb is running
+      service: name=arangodb state=started
+
+    - name: Remove authorized keys from user ubuntu
+      command: rm /home/ubuntu/.ssh/authorized_keys
+
+    - name: Remove authorized keys from user root
+      command: rm /root/.ssh/authorized_keys
