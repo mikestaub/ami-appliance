@@ -2,7 +2,7 @@
   "variables": {
   },
 
-    "provisioners": [
+  "provisioners": [
     {
       "type": "shell",
       "inline": ["sudo aptitude update"]
@@ -14,10 +14,12 @@
     {
       "type": "ansible-local",
       "playbook_file": "ansible/arangodb.yml",
-      "playbook_dir": "ansible"
+      "playbook_dir": "ansible",
+      "extra_arguments": ["--extra-vars", "arangodb_version={{user `arangodb_version`}}"]
     }
   ],
-    "builders": [
+
+  "builders": [
     {
       "type": "amazon-ebs",
       "region": "us-east-1",
@@ -25,7 +27,7 @@
       "instance_type": "m3.medium",
       "ami_virtualization_type": "hvm",
       "ssh_username": "ubuntu",
-      "ami_name": "arangodb-$VERSION-{{timestamp}}",
+      "ami_name": "arangodb-{{user `arangodb_version`}}-{{timestamp}}",
       "ami_block_device_mappings": [
         {
           "device_name": "/dev/sde",

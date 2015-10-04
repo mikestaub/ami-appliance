@@ -27,39 +27,40 @@
         state=present
         validate_certs=no
 
-    - name: Create a cluster Config file
-      template: src=templates/arangod.conf.local.j2 dest=/etc/arangodb/arangod.conf.local
-
-    - name: create arangodb temporary standalone folder
-      file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
-
     - name: add arangodb repo
       apt_repository:
         repo='deb https://www.arangodb.com/repositories/arangodb2/xUbuntu_14.04 /'
         state=present
 
     - name: install arangodb
-      apt: name=arangodb=$VERSION update_cache=yes
+      apt: name=arangodb={{arangodb_version}} update_cache=yes
+
+    - name: create a local config file
+      template: src=templates/arangod.conf.local.j2 dest=/etc/arangodb/arangod.conf.local
 
     - name: ensure arangodb is running
       service: name=arangodb state=stopped
 
     - name: delete arangodb temporay standalone folder
-      file: path={{mount_dir}}/standalone state=absent
+      file: path=/var/lib/arangodb state=absent
 
     - name: patch startup script to use default password
-      infile:
+      lineinfile:
         dest=/etc/init.d/arangodb
         insertafter="^CONF="
-        regexp="^ARANGODB_DEFAULT_ROOT_PASSWORD="
-        line="$(ec2metadata --instance-id)"
+        regexp="^export ARANGODB_DEFAULT_ROOT_PASSWORD="
+        line="export ARANGODB_DEFAULT_ROOT_PASSWORD=$(ec2metadata --instance-id)"
         state=present
 
-    - name: create arangodb finally standalone folder
-      file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
+    - name: patch datadir in startup script
+      lineinfile:
+        dest=/etc/init.d/arangodb
+        regexp=" cd /var/lib/arangodb "
+        line="    ( cd {{mount_dir}}/standalone && chown -R arangodb:arangodb . ) || exit 1"
+        state=present
 
-    - name: ensure arangodb is running
-      service: name=arangodb state=started
+    - name: create arangodb final standalone folder
+      file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
 
     - name: ensure arangodb is running
       service: name=arangodb state=started
