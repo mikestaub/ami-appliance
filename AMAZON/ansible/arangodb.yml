@@ -50,7 +50,7 @@
     - name: patch startup script to use default password
       lineinfile:
         dest=/etc/init.d/arangodb
-        insertafter="^CONF="
+        insertafter="^PIDFILE="
         regexp="^export ARANGODB_DEFAULT_ROOT_PASSWORD="
         line="export ARANGODB_DEFAULT_ROOT_PASSWORD=$(ec2metadata --instance-id)"
         state=present
