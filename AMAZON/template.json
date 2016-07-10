@@ -15,7 +15,11 @@
       "type": "ansible-local",
       "playbook_file": "ansible/arangodb.yml",
       "playbook_dir": "ansible",
-      "extra_arguments": ["--extra-vars", "arangodb_version={{user `arangodb_version`}}"]
+      "extra_arguments": [
+        "--extra-vars", "arangodb_version={{user `arangodb_version`}}",
+        "--extra-vars", "arangodb_name={{user `arangodb_name`}}",
+        "--extra-vars", "arangodb_repo={{user `arangodb_repo`}}"
+      ]
     }
   ],
 
