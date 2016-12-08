@@ -1,0 +1,83 @@
+---
+- hosts: all
+  sudo: yes
+
+  vars:
+    mount_dir: /vol/data
+
+  tasks:
+    - name: install libgmp10
+      apt: name=libgmp10
+
+    - name: install python-pycurl
+      apt: name=python-pycurl
+
+    - name: install cloud-utils
+      apt: name=cloud-utils
+
+# it seems the azzure image already brings this via another package:
+#    - name: install waagent
+#      apt: name=waagent
+
+#    - name: run wagent
+#      shell: waagent -deprovision+user
+
+#    - name: format new volume
+#      filesystem: fstype=ext4 dev=/dev/xvde
+
+#    - name: edit fstab and mount the vol
+#      action: mount name={{mount_dir}} src=/dev/xvde opts=noatime fstype=ext4 state=mounted
+
+    - name: add arangodb key
+      apt_key:
+        url=https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_16.04/Release.key
+        state=present
+        validate_certs=no
+
+    - name: add arangodb repo
+      apt_repository:
+        repo='deb https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_16.04 /'
+        state=present
+
+    - name: install arangodb
+      apt: name={{arangodb_name}}={{arangodb_version}} update_cache=yes
+
+    - name: create a local arangod config file
+      template: src=templates/{{arangodb_name}}/arangod.conf.local.j2 dest=/etc/{{arangodb_name}}/arangod.conf.local
+
+    - name: create a local arangosh config file
+      template: src=templates/{{arangodb_name}}/arangosh.conf.local.j2 dest=/etc/{{arangodb_name}}/arangosh.conf.local
+
+    - name: ensure arangodb is running
+      service: name={{arangodb_name}} state=stopped
+
+    - name: delete arangodb temporay standalone folder
+      file: path=/var/lib/{{arangodb_name}} state=absent
+
+    - name: patch startup script to use default password
+      lineinfile:
+        dest=/etc/init.d/{{arangodb_name}}
+        insertafter="^PIDFILE="
+        regexp="^export ARANGODB_DEFAULT_ROOT_PASSWORD="
+        line="export ARANGODB_DEFAULT_ROOT_PASSWORD=$(sudo dmidecode | grep UUID |sed 's;.*-;;')"
+        state=present
+
+    - name: patch datadir in startup script
+      lineinfile:
+        dest=/etc/init.d/{{arangodb_name}}
+        regexp=" cd /var/lib/{{arangodb_name}} "
+        line="    ( cd {{mount_dir}}/standalone && chown -R arangodb:arangodb . ) || exit 1"
+        state=present
+
+    # cannot use replace (avaiable from 1.6 onwards only)
+    - name: patch startup script
+      shell: sed -e 's:-c \$CONF::' < /etc/init.d/{{arangodb_name}} > /etc/init.d/{{arangodb_name}}.new && mv /etc/init.d/{{arangodb_name}}.new /etc/init.d/{{arangodb_name}} && chmod 755 /etc/init.d/{{arangodb_name}}
+
+    - name: create arangodb final standalone folder
+      file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
+
+    - name: Remove authorized keys from user packer
+      command: rm /home/packer/.ssh/authorized_keys
+
+    - name: Remove authorized keys from user root
+      command: rm /root/.ssh/authorized_keys

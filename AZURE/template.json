@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "sn": "BizSpark",
+    "ps": "/local/home/willi/src/BizSpark-12-6-2016-credentials.publishsettings",
+    "sa": "arangodb"
+  },
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": ["sudo aptitude update"]
+    },
+    {
+      "type": "shell",
+      "inline": ["sudo aptitude install -y ansible"]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/arangodb.yml",
+      "playbook_dir": "ansible",
+      "extra_arguments": [
+        "--extra-vars", "arangodb_version={{user `arangodb_version`}}",
+        "--extra-vars", "arangodb_name={{user `arangodb_name`}}",
+        "--extra-vars", "arangodb_repo={{user `arangodb_repo`}}"
+      ]
+    }
+  ],
+
+  "builders": [
+    {
+      "type": "azure",
+      "publish_settings_path": "{{user `ps`}}",
+      "subscription_name": "{{user `sn`}}",
+      "storage_account": "{{user `sa`}}",
+      "storage_account_container": "images",
+      "os_type": "Linux",
+      "os_image_label": "Ubuntu Server 14.04 LTS",
+      "location": "North Europe",
+      "instance_size": "Small",
+      "user_image_label": "ArangoDB_3_Ubuntu_Serv14"
+    }
+  ]
+}
