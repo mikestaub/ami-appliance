@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if test -d /vol/swap; then
+        exit
+fi
+/etc/init.d/arangodb3 stop
+rm -rf /vol/
+
+mkfs -t ext4 -F /dev/xvdb
+mkfs -t ext4 -F /dev/xvdc
+
+mkdir -p /vol/data/
+mkdir -p /vol/swap/
+
+cat /etc/fstab |grep -v xvdb > /tmp/fstab
+(
+cat /tmp/fstab
+cat <<EOF
+/dev/xvdb       /vol/data    auto    defaults,nofail,x-systemd.requires=cloud-init.service,comment=cloudconfig       0       2
+/dev/xvdc       /vol/swap    auto    defaults,nofail,x-systemd.requires=cloud-init.service,comment=cloudconfig       0       2
+/vol/swap/myswap    none    swap    sw    0   0
+EOF
+) > /etc/fstab
+
+mount /vol/data
+mount /vol/swap
+mkdir -p /vol/data/standalone
+
+
+dd if=/dev/zero of=/vol/swap/myswap bs=1M count=16096 
+chmod 0600 /vol/swap/myswap
+mkswap /vol/swap/myswap
+swapon /vol/swap/myswap
+
+/etc/init.d/arangodb3 restart
+

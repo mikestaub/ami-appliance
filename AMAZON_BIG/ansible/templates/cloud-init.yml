@@ -1,0 +1,15 @@
+#cloud-config
+
+bootcmd:
+  - mkfs -t ext4 /dev/xvdb
+  - mkfs -t ext4 /dev/xvdc
+mounts:
+  - [ /dev/xvdb /vol/data]
+  - [ /dev/xvdc /vol/swap]
+swap:
+  filename: /vol/swap/swap.img
+  size: "auto" # or size in bytes
+  maxsize: size in bytes
+
+mkdir:
+  - /vol/data/standalone

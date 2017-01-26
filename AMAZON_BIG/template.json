@@ -1,0 +1,53 @@
+{
+  "variables": {
+  },
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "export DEBIAN_FRONTEND=noninteractive; sudo apt-get -y update",
+        "export DEBIAN_FRONTEND=noninteractive; sudo apt-get -y install aptitude",
+        "export DEBIAN_FRONTEND=noninteractive; sudo aptitude install -y ansible"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/arangodb.yml",
+      "playbook_dir": "ansible",
+      "extra_arguments": [
+        "--extra-vars", "arangodb_version={{user `arangodb_version`}}",
+        "--extra-vars", "arangodb_name={{user `arangodb_name`}}",
+        "--extra-vars", "arangodb_repo={{user `arangodb_repo`}}"
+      ]
+    }
+  ],
+
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "us-east-1",
+      "source_ami": "ami-e13739f6",
+      "instance_type": "r3.8xlarge",
+      "ami_virtualization_type": "hvm",
+      "ssh_username": "ubuntu",
+      "ami_name": "arangodb-{{user `arangodb_version`}}-{{timestamp}}",
+      "ami_block_device_mappings": [
+        {
+          "device_name": "/dev/sde",
+          "volume_size": 80,
+          "volume_type": "gp2",
+          "delete_on_termination": true
+        }
+      ],
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sde",
+          "volume_size": 80,
+          "volume_type": "gp2",
+          "delete_on_termination": true
+        }
+      ]
+    }
+  ]
+}
