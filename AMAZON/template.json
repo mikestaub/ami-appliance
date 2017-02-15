@@ -31,6 +31,7 @@
       "instance_type": "m3.medium",
       "ami_virtualization_type": "hvm",
       "ssh_username": "ubuntu",
+      "ssh_wait_timeout": "30m",
       "ami_name": "arangodb-{{user `arangodb_version`}}-{{timestamp}}",
       "ami_block_device_mappings": [
         {
