@@ -5,11 +5,11 @@
   "provisioners": [
     {
       "type": "shell",
-      "inline": ["sudo aptitude update"]
-    },
-    {
-      "type": "shell",
-      "inline": ["sudo aptitude install -y ansible"]
+      "inline": [
+        "export DEBIAN_FRONTEND=noninteractive; sudo apt-get -y update",
+        "export DEBIAN_FRONTEND=noninteractive; sudo apt-get -y install aptitude",
+        "export DEBIAN_FRONTEND=noninteractive; sudo aptitude install -y ansible"
+      ]
     },
     {
       "type": "ansible-local",
@@ -27,7 +27,7 @@
     {
       "type": "amazon-ebs",
       "region": "us-east-1",
-      "source_ami": "ami-ce5be9a6",
+      "source_ami": "ami-e13739f6",
       "instance_type": "m3.medium",
       "ami_virtualization_type": "hvm",
       "ssh_username": "ubuntu",

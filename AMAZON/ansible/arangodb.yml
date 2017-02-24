@@ -1,11 +1,15 @@
 ---
 - hosts: all
-  sudo: yes
+  become_method: sudo
+  become: yes
 
   vars:
     mount_dir: /vol/data
 
   tasks:
+    - name: install libgmp10
+      apt:  update_cache=yes upgrade=full
+
     - name: install libgmp10
       apt: name=libgmp10
 
@@ -23,13 +27,13 @@
 
     - name: add arangodb key
       apt_key:
-        url=https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_14.04/Release.key
+        url=https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_16.04/Release.key
         state=present
         validate_certs=no
 
     - name: add arangodb repo
       apt_repository:
-        repo='deb https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_14.04 /'
+        repo='deb https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_16.04 /'
         state=present
 
     - name: install arangodb
@@ -74,3 +78,6 @@
 
     - name: Remove authorized keys from user root
       command: rm /root/.ssh/authorized_keys
+
+    - name: remove cache files and logs
+      command: rm -f /var/cache/apt/archives/*deb /var/log/*
