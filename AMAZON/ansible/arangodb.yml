@@ -7,11 +7,43 @@
     mount_dir: /vol/data
 
   tasks:
-    - name: install libgmp10
+    - name: install libgmp10 (1)
       apt:  update_cache=yes upgrade=full
 
-    - name: install libgmp10
+    - name: install libgmp10 (2)
       apt: name=libgmp10
+
+    - name: install aws cloudwatch agent (1)
+      command: wget https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+
+    - name: install aws cloudwatch agent (2)
+      copy:
+        content: "[general]
+          state_file = /var/awslogs/state/agent-state
+
+          [/var/log/syslog]
+          file = /var/log/syslog
+          log_stream_name = syslog
+          log_group_name = stage
+          datetime_format = %b %d %H:%M:%S
+          initial_position = start_of_file"
+        dest: /tmp/cw-agent.config
+
+    - name: install aws cloudwatch agent (3)
+      command: python awslogs-agent-setup.py -n -r us-east-1 -c /tmp/cw-agent.config
+    
+    - name: install aws cloudwatch agent (4)
+      copy:
+        content: "[default]
+          aws_access_key_id = {{ lookup('env','AWS_ACCESSS_KEY_ID') }}
+          aws_secret_access_key = {{ lookup('env','AWS_SECRET_ACCESSS_KEY') }}
+          region = us-east-1
+          [plugins]
+          cwlogs = cwlogs"
+        dest: /var/awslogs/etc/aws.conf
+
+    - name: install aws cloudwatch agent (5)
+      command: service awslogs restart
 
     - name: install python-pycurl
       apt: name=python-pycurl
