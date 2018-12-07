@@ -18,7 +18,9 @@
       "extra_arguments": [
         "--extra-vars", "arangodb_version={{user `arangodb_version`}}",
         "--extra-vars", "arangodb_name={{user `arangodb_name`}}",
-        "--extra-vars", "arangodb_repo={{user `arangodb_repo`}}"
+        "--extra-vars", "arangodb_repo={{user `arangodb_repo`}}",
+        "--extra-vars", "aws_access_key_id={{env `AWS_ACCESSS_KEY_ID`}}",
+        "--extra-vars", "aws_secret_access_key={{env `AWS_SECRET_ACCESSS_KEY`}}"
       ]
     }
   ],
@@ -27,7 +29,7 @@
     {
       "type": "amazon-ebs",
       "region": "us-east-1",
-      "source_ami": "ami-e13739f6",
+      "source_ami": "ami-0f9cf087c1f27d9b1",
       "instance_type": "m3.medium",
       "ami_virtualization_type": "hvm",
       "ssh_username": "ubuntu",

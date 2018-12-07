@@ -18,27 +18,36 @@
 
     - name: install aws cloudwatch agent (2)
       copy:
-        content: "[general]
-          state_file = /var/awslogs/state/agent-state
+        content: "[general]\n
+          state_file = /var/awslogs/state/agent-state\n
 
-          [/var/log/syslog]
-          file = /var/log/syslog
-          log_stream_name = syslog
-          log_group_name = stage
-          datetime_format = %b %d %H:%M:%S
-          initial_position = start_of_file"
+          [/var/log/syslog]\n
+          file = /var/log/syslog\n
+          log_stream_name = /aws/ec2/syslog\n
+          log_group_name = {instance_id}\n
+          datetime_format = %b %d %H:%M:%S\n
+          initial_position = start_of_file\n
+          \n
+          [/var/log/arangodb3]\n
+          datetime_format = %b %d %H:%M:%S\n
+          file = /var/log/arangodb3/arangod.log\n
+          buffer_duration = 5000\n
+          log_stream_name = {instance_id}\n
+          initial_position = start_of_file\n
+          log_group_name = /aws/ec2/arangodb3\n
+          "
         dest: /tmp/cw-agent.config
 
     - name: install aws cloudwatch agent (3)
       command: python awslogs-agent-setup.py -n -r us-east-1 -c /tmp/cw-agent.config
-    
+
     - name: install aws cloudwatch agent (4)
       copy:
-        content: "[default]
-          aws_access_key_id = {{ lookup('env','AWS_ACCESSS_KEY_ID') }}
-          aws_secret_access_key = {{ lookup('env','AWS_SECRET_ACCESSS_KEY') }}
-          region = us-east-1
-          [plugins]
+        content: "[default]\n
+          aws_access_key_id = {{aws_access_key_id}}\n
+          aws_secret_access_key = {{aws_secret_access_key}}\n
+          region = us-east-1\n
+          [plugins]\n
           cwlogs = cwlogs"
         dest: /var/awslogs/etc/aws.conf
 
@@ -80,22 +89,12 @@
     - name: ensure arangodb is running
       service: name={{arangodb_name}} state=stopped
 
-    - name: delete arangodb temporay standalone folder
-      file: path=/var/lib/{{arangodb_name}} state=absent
-
     - name: patch startup script to use default password
       lineinfile:
         dest=/etc/init.d/{{arangodb_name}}
         insertafter="^PIDFILE="
         regexp="^export ARANGODB_DEFAULT_ROOT_PASSWORD="
         line="export ARANGODB_DEFAULT_ROOT_PASSWORD=$(ec2metadata --instance-id)"
-        state=present
-
-    - name: patch datadir in startup script
-      lineinfile:
-        dest=/etc/init.d/{{arangodb_name}}
-        regexp=" cd /var/lib/{{arangodb_name}} "
-        line="    ( cd {{mount_dir}}/standalone && chown -R arangodb:arangodb . ) || exit 1"
         state=present
 
     # cannot use replace (avaiable from 1.6 onwards only)
