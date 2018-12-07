@@ -7,7 +7,7 @@
     mount_dir: /vol/data
 
   tasks:
-    - name: install libgmp10 (1)
+    - name: apt update
       apt:  update_cache=yes upgrade=full
 
     - name: install libgmp10 (2)
