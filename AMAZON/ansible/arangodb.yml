@@ -68,13 +68,13 @@
 
     - name: add arangodb key
       apt_key:
-        url=https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_16.04/Release.key
+        url=https://download.arangodb.com/{{arangodb_repo}}/DEBIAN/Release.key
         state=present
         validate_certs=no
 
     - name: add arangodb repo
       apt_repository:
-        repo='deb https://www.arangodb.com/repositories/{{arangodb_repo}}/xUbuntu_16.04 /'
+        repo='deb https://download.arangodb.com/{{arangodb_repo}}/DEBIAN /'
         state=present
 
     - name: install arangodb
