@@ -18,23 +18,22 @@
 
     - name: install aws cloudwatch agent (2)
       copy:
-        content: "[general]\n
-          state_file = /var/awslogs/state/agent-state\n
-
-          [/var/log/syslog]\n
-          file = /var/log/syslog\n
-          log_stream_name = /aws/ec2/syslog\n
-          log_group_name = {instance_id}\n
-          datetime_format = %b %d %H:%M:%S\n
-          initial_position = start_of_file\n
+        content: "[general]
+          \nstate_file = /var/awslogs/state/agent-state
           \n
-          [/var/log/arangodb3]\n
-          datetime_format = %b %d %H:%M:%S\n
-          file = /var/log/arangodb3/arangod.log\n
-          buffer_duration = 5000\n
-          log_stream_name = {instance_id}\n
-          initial_position = start_of_file\n
-          log_group_name = /aws/ec2/arangodb3\n
+          \n[/var/log/syslog]
+          \nfile = /var/log/syslog
+          \nlog_group_name=/aws/ec2/syslog
+          \nlog_stream_name={instance_id}
+          \ndatetime_format = %b %d %H:%M:%S
+          \ninitial_position = start_of_file
+          \n
+          \n[/var/log/arangodb3]
+          \nfile = /var/log/arangodb3/arangod.log
+          \nlog_group_name=/aws/ec2/arangodb3
+          \nlog_stream_name={instance_id}
+          \ndatetime_format = %b %d %H:%M:%S
+          \ninitial_position = start_of_file
           "
         dest: /tmp/cw-agent.config
 
@@ -43,12 +42,12 @@
 
     - name: install aws cloudwatch agent (4)
       copy:
-        content: "[default]\n
-          aws_access_key_id = {{aws_access_key_id}}\n
-          aws_secret_access_key = {{aws_secret_access_key}}\n
-          region = us-east-1\n
-          [plugins]\n
-          cwlogs = cwlogs"
+        content: "[default]
+          \naws_access_key_id={{aws_access_key_id}}
+          \naws_secret_access_key={{aws_secret_access_key}}
+          \nregion=us-east-1
+          \n[plugins]
+          \ncwlogs = cwlogs"
         dest: /var/awslogs/etc/aws.conf
 
     - name: install aws cloudwatch agent (5)
@@ -89,17 +88,21 @@
     - name: ensure arangodb is running
       service: name={{arangodb_name}} state=stopped
 
-    - name: patch startup script to use default password
+    - name: patch startup script to use arangodb user
       lineinfile:
-        dest=/etc/init.d/{{arangodb_name}}
-        insertafter="^PIDFILE="
-        regexp="^export ARANGODB_DEFAULT_ROOT_PASSWORD="
-        line="export ARANGODB_DEFAULT_ROOT_PASSWORD=$(ec2metadata --instance-id)"
+        dest=/lib/systemd/system/{{arangodb_name}}.service
+        insertafter="^Type=simple"
+        regexp="^Type=simple"
+        line="Type=Simple\nUser=arangodb\nPermissionsStartOnly=true\n"
         state=present
 
-    # cannot use replace (avaiable from 1.6 onwards only)
-    - name: patch startup script
-      shell: sed -e 's:-c \$CONF::' < /etc/init.d/{{arangodb_name}} > /etc/init.d/{{arangodb_name}}.new && mv /etc/init.d/{{arangodb_name}}.new /etc/init.d/{{arangodb_name}} && chmod 755 /etc/init.d/{{arangodb_name}}
+    - name: patch startup script to use default password
+      lineinfile:
+        dest=/lib/systemd/system/{{arangodb_name}}.service
+        insertafter="^ExecStartPre=/usr/bin/env chmod 700 /var/lib/arangodb3-apps"
+        regexp="^ExecStartPre=/usr/bin/env chmod 700 /var/lib/arangodb3-apps"
+        line="ExecStartPre=/usr/bin/env chmod 700 /var/lib/arangodb3-apps\nExecStartPre=/bin/bash -c \"/bin/systemctl set-environment ARANGODB_DEFAULT_ROOT_PASSWORD=$( ec2metadata --instance-id )\"\n"
+        state=present
 
     - name: create arangodb final standalone folder
       file: path={{mount_dir}}/standalone state=directory owner=arangodb group=arangodb
